@@ -4,22 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GenBio 2: Master Reviewer</title>
+    <title>GenBio 2: Mastery Reviewer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #3b82f6;
-            --bg: #0f172a;
-        }
+        :root { --primary: #3b82f6; --bg: #0f172a; }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg);
             background-image: 
-                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(30, 64, 175, 0.15) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(30, 64, 175, 0.12) 0px, transparent 50%);
             color: #f8fafc;
             margin: 0;
             min-height: 100vh;
@@ -31,27 +28,18 @@
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .option-btn {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .option-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-slide-up { animation: slideUp 0.5s ease-out forwards; }
-        
-        /* Custom scrollbar for review mode */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 <script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.2.3/",
     "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/"
   }
 }
 </script>
@@ -61,37 +49,122 @@
 
     <script type="module">
         import { h, render } from 'https://esm.sh/preact';
-        import { useState, useMemo, useEffect } from 'https://esm.sh/preact/hooks';
+        import { useState, useEffect } from 'https://esm.sh/preact/hooks';
         import htm from 'https://esm.sh/htm';
 
         const html = htm.bind(h);
 
-        // --- DATA SECTION: 150 QUESTIONS ---
-        const RAW_DATA = [
-            { t: "Systematics", q: "Which of the following is the correct order of Linnaean classification from most inclusive to least inclusive?", o: ["Kingdom, Phylum, Class, Order, Family, Genus, Species", "Domain, Kingdom, Phylum, Class, Order, Family, Genus, Species", "Species, Genus, Family, Order, Class, Phylum, Kingdom", "Domain, Phylum, Kingdom, Order, Class, Family, Genus, Species"], a: 1, e: "The hierarchy starts with Domain (added later) down to the specific Species." },
-            { t: "Cladistics", q: "A group that contains a common ancestor but NOT all of its descendants is called:", o: ["Monophyletic", "Polyphyletic", "Paraphyletic", "Homoplasic"], a: 2, e: "Paraphyletic groups leave out some descendants (e.g., 'Reptiles' excluding birds)." },
-            { t: "Cladistics", q: "Which term describes a shared derived character used to define a clade?", o: ["Plesiomorphy", "Synapomorphy", "Apomorphy", "Homology"], a: 1, e: "Synapomorphies are traits shared by all members of a clade and their immediate ancestor." },
-            { t: "Geologic Time", q: "In which eon did the 'Great Oxygenation Event' occur?", o: ["Hadean", "Archean", "Proterozoic", "Phanerozoic"], a: 2, e: "The Proterozoic saw the rise of atmospheric oxygen due to cyanobacteria." },
-            { t: "Geologic Time", q: "The 'Age of Reptiles' corresponds to which era?", o: ["Paleozoic", "Mesozoic", "Cenozoic", "Precambrian"], a: 1, e: "The Mesozoic (Triassic, Jurassic, Cretaceous) was dominated by dinosaurs." },
-            { t: "Evolution", q: "Which mechanism of evolution is a change in allele frequency due to random chance events?", o: ["Natural Selection", "Gene Flow", "Genetic Drift", "Mutation"], a: 2, e: "Genetic drift affects small populations more significantly due to random sampling." },
-            { t: "Evolution", q: "Which type of selection favors both extremes of a phenotypic distribution?", o: ["Directional Selection", "Stabilizing Selection", "Disruptive Selection", "Sexual Selection"], a: 2, e: "Disruptive selection favors high and low values, often leading to speciation." },
-            { t: "Fossils", q: "Which fossil type provides evidence of the activity of an organism rather than its body?", o: ["Mold", "Cast", "Trace Fossil", "Index Fossil"], a: 2, e: "Trace fossils include footprints, burrows, and coprolites." },
-            { t: "Taxonomy", q: "Who is known as the 'Father of Taxonomy'?", o: ["Darwin", "Mendel", "Linnaeus", "Lamarck"], a: 2, e: "Linnaeus established the two-part naming system (Genus species)." },
-            { t: "Cladistics", q: "What is the simplest explanation for a set of data in phylogenetics called?", o: ["Cladism", "Parsimony", "Ontogeny", "Homology"], a: 1, e: "Parsimony (Occam's Razor) assumes the fewest evolutionary changes is the most likely truth." }
-        ];
+        const QUESTIONS = [
+            // UNIT 1: SYSTEMATICS & TAXONOMY (20 items)
+            { t: "Systematics", q: "The analytical approach to understanding the diversity and relationships of organisms, both present and extinct, is:", o: ["Taxonomy", "Systematics", "Evolution", "Ontogeny"], a: 1, e: "Systematics is the broad field, while Taxonomy is specifically about naming." },
+            { t: "Taxonomy", q: "Who established the binomial system of nomenclature?", o: ["Darwin", "Linnaeus", "Wallace", "Aristotle"], a: 1, e: "Carl Linnaeus, the father of modern taxonomy." },
+            { t: "Taxonomy", q: "In 'Homo sapiens', the word 'sapiens' refers to the:", o: ["Genus", "Family", "Specific Epithet", "Class"], a: 2, e: "The first word is the genus, the second is the specific epithet." },
+            { t: "Systematics", q: "Which of the following is the most specific level of classification?", o: ["Family", "Order", "Genus", "Class"], a: 2, e: "The hierarchy goes: Domain > Kingdom > Phylum > Class > Order > Family > Genus > Species." },
+            { t: "Taxonomy", q: "Modern taxonomy classifies organisms based on:", o: ["Physical traits only", "Evolutionary relationships", "Geographic location", "Alphabetical order"], a: 1, e: "Classification now reflects common ancestry (phylogeny)." },
+            { t: "Taxonomy", q: "The three domains of life are:", o: ["Animalia, Plantae, Fungi", "Bacteria, Archaea, Eukarya", "Monera, Protista, Eukarya", "Eubacteria, Protista, Animalia"], a: 1, e: "The three-domain system was proposed by Carl Woese." },
+            { t: "Taxonomy", q: "Which kingdom was split into Bacteria and Archaea in the three-domain system?", o: ["Protista", "Monera", "Fungi", "Plantae"], a: 1, e: "Kingdom Monera was found to be too genetically diverse and was split." },
+            { t: "Systematics", q: "What is a 'Taxon'?", o: ["A naming tool", "A taxonomic unit at any level of hierarchy", "An extinct species", "A type of fossil"], a: 1, e: "A taxon can be a specific species, a genus, or an entire kingdom." },
+            { t: "Taxonomy", q: "Correct scientific writing for humans is:", o: ["Homo Sapiens", "homo sapiens", "Homo sapiens (italicized)", "Homo Sapiens (italicized)"], a: 2, e: "Genus is capitalized, species is lowercase, and both are italicized (or underlined)." },
+            { t: "Systematics", q: "What is the primary goal of phylogenetic systematics?", o: ["Naming new species", "Grouping organisms by evolutionary history", "Preserving biodiversity", "Studying fossil layers"], a: 1, e: "Phylogenetic systematics aims to reflect the 'Tree of Life'." },
+            { t: "Systematics", q: "A diagram representing a hypothesis about evolutionary relationships is a:", o: ["Taxonomy Chart", "Phylogenetic Tree", "Punnett Square", "Food Web"], a: 1, e: "Trees represent ancestors and lineages." },
+            { t: "Taxonomy", q: "Which rank falls between Class and Family?", o: ["Phylum", "Kingdom", "Order", "Genus"], a: 2, e: "Class -> Order -> Family." },
+            { t: "Taxonomy", q: "Archaea are distinguished from Bacteria primarily by their:", o: ["Lack of a nucleus", "Cell wall composition and RNA", "Size", "Ability to move"], a: 1, e: "Archaea lack peptidoglycan and have unique ribosomal RNA." },
+            { t: "Systematics", q: "Divergent evolution leads to:", o: ["Analogous structures", "Homologous structures", "Convergent traits", "Identical DNA"], a: 1, e: "Homologous structures come from a common ancestor but may serve different functions." },
+            { t: "Systematics", q: "Analogy (Convergent Evolution) is often a result of:", o: ["Common ancestry", "Similar environmental pressures", "Random mutation", "Genetic drift"], a: 1, e: "Convergent evolution produces similar traits in unrelated species (e.g., wings in birds vs bats)." },
+            { t: "Systematics", q: "The science of naming and grouping organisms is:", o: ["Phylogeny", "Taxonomy", "Cladistics", "Genetics"], a: 1, e: "Taxonomy is the specific branch for naming and categorization." },
+            { t: "Taxonomy", q: "Which domain consists of all organisms with a nucleus?", o: ["Bacteria", "Archaea", "Eukarya", "Protista"], a: 2, e: "Eukarya includes plants, animals, fungi, and protists." },
+            { t: "Taxonomy", q: "The most inclusive category in the modern system is:", o: ["Kingdom", "Domain", "Phylum", "Universe"], a: 1, e: "Domain is broader than Kingdom." },
+            { t: "Systematics", q: "Molecular systematics uses what to determine relationships?", o: ["Fossil records", "Body shapes", "DNA and protein sequences", "Geographic maps"], a: 2, e: "DNA comparisons are now the 'gold standard' for phylogeny." },
+            { t: "Systematics", q: "What is 'Morphology'?", o: ["The study of DNA", "The study of form and structure", "The study of behavior", "The study of fossils"], a: 1, e: "Morphology refers to physical characteristics." },
 
-        // Generate the full 150 count by adding variants
-        const QUESTIONS = Array.from({ length: 150 }, (_, i) => {
-            const base = RAW_DATA[i % RAW_DATA.length];
-            return {
-                id: i + 1,
-                topic: base.t,
-                question: i < RAW_DATA.length ? base.q : `${base.q} (V.${Math.floor(i / RAW_DATA.length)})`,
-                options: base.o,
-                correct: base.a,
-                explanation: base.e
-            };
-        });
+            // UNIT 2: CLADISTICS (20 items)
+            { t: "Cladistics", q: "In cladistics, a group of species that includes an ancestral species and all its descendants is a:", o: ["Clade", "Order", "Genus", "Phylum"], a: 0, e: "A clade is a monophyletic group." },
+            { t: "Cladistics", q: "A monophyletic group is also known as a:", o: ["Paraphyletic group", "Clade", "Polyphyletic group", "Taxon"], a: 1, e: "Mono = one ancestor + all descendants." },
+            { t: "Cladistics", q: "A group consisting of an ancestor and some, but not all, of its descendants is:", o: ["Monophyletic", "Paraphyletic", "Polyphyletic", "Synapomorphic"], a: 1, e: "Para = beside/partial." },
+            { t: "Cladistics", q: "A shared ancestral character is called a:", o: ["Synapomorphy", "Plesiomorphy", "Apomorphy", "Homoplasy"], a: 1, e: "Plesiomorphy is a trait inherited from a distant ancestor (e.g., backbone in mammals)." },
+            { t: "Cladistics", q: "A shared derived character is called a:", o: ["Plesiomorphy", "Synapomorphy", "Homoplasy", "Cladogram"], a: 1, e: "Synapomorphy is unique to a specific clade (e.g., hair in mammals)." },
+            { t: "Cladistics", q: "The principle that the simplest explanation is usually the correct one is:", o: ["Darwinism", "Parsimony", "Lamarckism", "Ontogeny"], a: 1, e: "Occam's Razor applied to biology." },
+            { t: "Cladistics", q: "The branching point on a cladogram represents:", o: ["A species", "A common ancestor", "A mutation", "An extinction"], a: 1, e: "Nodes represent the point of divergence." },
+            { t: "Cladistics", q: "A species or group known to have diverged before the lineage of the group being studied is the:", o: ["Ingroup", "Outgroup", "Sister group", "Basal taxon"], a: 1, e: "The outgroup provides a point of comparison." },
+            { t: "Cladistics", q: "What is a 'Polyphyletic' group?", o: ["Ancestor + all descendants", "Ancestor + some descendants", "Distantly related species but no common ancestor", "Only two species"], a: 2, e: "Polyphyletic groups group species by traits regardless of shared ancestry." },
+            { t: "Cladistics", q: "The horizontal length of branches in some trees can represent:", o: ["Genetic change", "Time", "Both A and B", "Neither"], a: 2, e: "Branches can be scaled to time or amount of mutation." },
+            { t: "Cladistics", q: "A 'Basal Taxon' is one that:", o: ["Evolved recently", "Diverged early and remains relatively unchanged", "Is extinct", "Is the outgroup"], a: 1, e: "Basal means at the base of the tree." },
+            { t: "Cladistics", q: "Sister taxa share an immediate:", o: ["Common ancestor", "Environment", "Mutation", "Fossil record"], a: 0, e: "They are each other's closest relatives on a tree." },
+            { t: "Cladistics", q: "Homoplasy refers to:", o: ["Shared ancestry", "Analogous structures (Convergent evolution)", "DNA mutations", "Identical twins"], a: 1, e: "Homoplasies are traits that look alike but aren't from a common ancestor." },
+            { t: "Cladistics", q: "What tool is used to build a phylogenetic tree based on shared traits?", o: ["Microscope", "Character Table", "Scale", "Map"], a: 1, e: "Comparing 0s and 1s (absence/presence) for traits." },
+            { t: "Cladistics", q: "Which trait would be a symplesiomorphy for all mammals?", o: ["Hair", "Backbone", "Mammary glands", "Placenta"], a: 1, e: "Backbone is shared with fish, reptiles, etc. (Ancestral). Hair is unique (Derived)." },
+            { t: "Cladistics", q: "The term 'Cladogenesis' refers to:", o: ["Species turning into another slowly", "Branching evolution", "Extinction", "Genetic drift"], a: 1, e: "Splitting of a lineage into two or more." },
+            { t: "Cladistics", q: "Maximum Likelihood is a method for:", o: ["Predicting the future", "Finding the most probable tree based on DNA data", "Measuring fossils", "Naming species"], a: 1, e: "A statistical approach to phylogeny." },
+            { t: "Cladistics", q: "A clade must contain how many ancestors?", o: ["One", "Many", "None", "Exactly two"], a: 0, e: "A single ancestral species and all its descendants." },
+            { t: "Cladistics", q: "What does 'Apomorphy' mean?", o: ["Ancestral trait", "Derived trait", "Analogous trait", "Vestigial trait"], a: 1, e: "A novel evolutionary trait." },
+            { t: "Cladistics", q: "Cladistics is strictly based on:", o: ["Evolutionary descent", "Physical beauty", "Size", "Age"], a: 0, e: "It ignores overall similarity in favor of shared derived traits." },
+
+            // UNIT 3: GEOLOGIC TIME SCALE (20 items)
+            { t: "Geologic Time", q: "Earth is approximately how old?", o: ["4.6 million years", "4.6 billion years", "10,000 years", "100 billion years"], a: 1, e: "Confirmed by radiometric dating of meteorites." },
+            { t: "Geologic Time", q: "The largest division of geologic time is the:", o: ["Era", "Period", "Eon", "Epoch"], a: 2, e: "Eons are divided into eras." },
+            { t: "Geologic Time", q: "During which Eon did life first appear?", o: ["Hadean", "Archean", "Proterozoic", "Phanerozoic"], a: 1, e: "Oldest bacterial fossils date to the Archean." },
+            { t: "Geologic Time", q: "The 'Cambrian Explosion' occurred at the start of which Era?", o: ["Paleozoic", "Mesozoic", "Cenozoic", "Precambrian"], a: 0, e: "The Paleozoic (Old Life) era." },
+            { t: "Geologic Time", q: "The Mesozoic Era is known as the Age of:", o: ["Mammals", "Reptiles", "Fish", "Plants"], a: 1, e: "Dinosaurs ruled the Mesozoic." },
+            { t: "Geologic Time", q: "Which era are we currently living in?", o: ["Paleozoic", "Mesozoic", "Cenozoic", "Quaternary"], a: 2, e: "Cenozoic is the current era (Era of Mammals)." },
+            { t: "Geologic Time", q: "The mass extinction that killed the dinosaurs occurred at the end of the:", o: ["Permian", "Triassic", "Cretaceous", "Jurassic"], a: 2, e: "The K-Pg (Cretaceous-Paleogene) extinction." },
+            { t: "Geologic Time", q: "What caused the Great Oxygenation Event?", o: ["Volcanoes", "Comets", "Cyanobacteria (Photosynthesis)", "Forest fires"], a: 2, e: "Oxygen was a byproduct of early photosynthesis." },
+            { t: "Geologic Time", q: "The supercontinent that existed during the late Paleozoic was:", o: ["Gondwana", "Laurasia", "Pangea", "Rodinia"], a: 2, e: "Pangea formed about 300 million years ago." },
+            { t: "Geologic Time", q: "In which period did the first land plants appear?", o: ["Cambrian", "Ordovician", "Silurian", "Carboniferous"], a: 1, e: "Plants colonized land in the Ordovician/Silurian." },
+            { t: "Geologic Time", q: "The 'Age of Amphibians' is associated with which period?", o: ["Devonian", "Carboniferous", "Permian", "Jurassic"], a: 1, e: "Amphibians flourished in the swamps of the Carboniferous." },
+            { t: "Geologic Time", q: "What event marks the end of the Paleozoic Era?", o: ["Meteor impact", "Great Dying (Permian Extinction)", "Ice Age", "Human evolution"], a: 1, e: "The Permian extinction wiped out 96% of marine species." },
+            { t: "Geologic Time", q: "The first birds appeared during which period?", o: ["Triassic", "Jurassic", "Cretaceous", "Paleogene"], a: 1, e: "Archeopteryx is from the Jurassic." },
+            { t: "Geologic Time", q: "The current period is the:", o: ["Tertiary", "Quaternary", "Holocene", "Anthropocene"], a: 1, e: "We are in the Quaternary period." },
+            { t: "Geologic Time", q: "Which eon covers the vast majority (88%) of Earth's history?", o: ["Phanerozoic", "Precambrian (Supereon)", "Archean", "Hadean"], a: 1, e: "Precambrian includes Hadean, Archean, and Proterozoic." },
+            { t: "Geologic Time", q: "Multicellular eukaryotes first appeared in which eon?", o: ["Archean", "Proterozoic", "Phanerozoic", "Hadean"], a: 1, e: "Complex life started in the Proterozoic." },
+            { t: "Geologic Time", q: "The 'Great Dying' occurred between which two eras?", o: ["Precambrian/Paleozoic", "Paleozoic/Mesozoic", "Mesozoic/Cenozoic", "Hadean/Archean"], a: 1, e: "End of Paleozoic." },
+            { t: "Geologic Time", q: "Which epoch are we technically in, starting ~12k years ago?", o: ["Pleistocene", "Holocene", "Eocene", "Miocene"], a: 1, e: "The Holocene followed the last Ice Age." },
+            { t: "Geologic Time", q: "What type of rock is best for finding fossils?", o: ["Igneous", "Sedimentary", "Metamorphic", "Magma"], a: 1, e: "Sedimentary layers preserve organic remains." },
+            { t: "Geologic Time", q: "What is the 'K-T boundary'?", o: ["A mountain range", "A layer of iridium-rich clay", "A deep sea trench", "A time machine"], a: 1, e: "Evidence of the asteroid impact 66 million years ago." },
+
+            // UNIT 4: FOSSILS (20 items)
+            { t: "Fossils", q: "Any preserved remains or evidence of an ancient organism is a:", o: ["Artifact", "Fossil", "Bone", "Impression"], a: 1, e: "Definition of a fossil." },
+            { t: "Fossils", q: "The study of fossils is called:", o: ["Biology", "Geology", "Paleontology", "Taphonomy"], a: 2, e: "Paleontology uses fossils to reconstruct history." },
+            { t: "Fossils", q: "A fossil that is the hollow impression of an organism is a:", o: ["Cast", "Mold", "Trace fossil", "Petrified fossil"], a: 1, e: "A mold is like a negative stamp." },
+            { t: "Fossils", q: "When minerals fill a mold and harden, it creates a:", o: ["Mold", "Cast", "Carbon film", "Amber"], a: 1, e: "A cast is the positive copy." },
+            { t: "Fossils", q: "Fossils that show the activity or behavior of an organism are:", o: ["Body fossils", "Trace fossils", "Index fossils", "Microfossils"], a: 1, e: "Examples: Footprints, burrows, coprolites." },
+            { t: "Fossils", q: "What are 'Coprolites'?", o: ["Fossilized eggs", "Fossilized feces", "Fossilized teeth", "Fossilized plants"], a: 1, e: "Trace fossils of diet and behavior." },
+            { t: "Fossils", q: "The process where minerals replace organic material cell by cell is:", o: ["Carbonization", "Petrification (Permineralization)", "Mummification", "Freezing"], a: 1, e: "Common in petrified wood." },
+            { t: "Fossils", q: "Fossilized tree resin is called:", o: ["Sap", "Pitch", "Amber", "Coal"], a: 2, e: "Amber often traps insects with high detail." },
+            { t: "Fossils", q: "The thin layer of carbon left behind by a compressed leaf is a:", o: ["Mold", "Carbon film", "Cast", "Trace fossil"], a: 1, e: "Carbonization process." },
+            { t: "Fossils", q: "Which fossils are used to date rock layers because they were widespread and short-lived?", o: ["Trace fossils", "Index fossils", "Body fossils", "Microfossils"], a: 1, e: "Index fossils help in relative dating." },
+            { t: "Fossils", q: "Relative dating uses what principle?", o: ["Carbon dating", "Law of Superposition", "Half-life", "DNA testing"], a: 1, e: "Oldest layers are on the bottom." },
+            { t: "Fossils", q: "What is 'Taphonomy'?", o: ["Study of bones", "The study of the transition of remains into fossils", "Study of footprints", "Study of DNA"], a: 1, e: "It covers death, burial, and fossilization." },
+            { t: "Fossils", q: "Which isotopes are used to date very old rocks?", o: ["Carbon-14", "Uranium-238", "Oxygen-16", "Nitrogen-14"], a: 1, e: "Carbon-14 is only for recent organic material (<50k years)." },
+            { t: "Fossils", q: "What is an 'Unaltered' fossil?", o: ["Petrified wood", "Freezing in permafrost", "A cast", "A trace"], a: 1, e: "Unaltered fossils preserve original tissue (e.g., mammoths in ice)." },
+            { t: "Fossils", q: "Most fossils represent organisms that lived in:", o: ["Deserts", "High mountains", "Water/Near water", "Forests"], a: 2, e: "Sedimentation is much higher in water environments." },
+            { t: "Fossils", q: "What is the 'Fossil Record'?", o: ["A book of fossils", "The totality of fossils found and their placement in rock", "A museum exhibit", "A digital database"], a: 1, e: "It provides a chronological narrative of life." },
+            { t: "Fossils", q: "Gastroliths are trace fossils of:", o: ["Stomach stones used for digestion", "Nests", "Teeth marks", "Skins"], a: 0, e: "Used by some dinosaurs and birds." },
+            { t: "Fossils", q: "Why is the fossil record 'incomplete'?", o: ["Scientists are lazy", "Most organisms don't fossilize", "Rocks are destroyed by erosion", "Both B and C"], a: 3, e: "Only a fraction of life is preserved and accessible." },
+            { t: "Fossils", q: "Carbon-14 dating works on what material?", o: ["Granite", "Volcanic ash", "Organic material (Bone/Wood)", "Diamonds"], a: 2, e: "It requires once-living carbon." },
+            { t: "Fossils", q: "A gap in the rock record is called an:", o: ["Index", "Unconformity", "Intrusion", "Fault"], a: 1, e: "Represents missing time due to erosion or non-deposition." },
+
+            // UNIT 5: EVOLUTIONARY MECHANISMS (20 items)
+            { t: "Evolution", q: "The primary mechanism of evolution proposed by Darwin is:", o: ["Genetic Drift", "Natural Selection", "Mutation", "Gene Flow"], a: 1, e: "Survival and reproduction of the fittest." },
+            { t: "Evolution", q: "A change in the gene pool of a population due to chance is:", o: ["Selection", "Genetic Drift", "Gene Flow", "Adaptation"], a: 1, e: "Drift is random; selection is non-random." },
+            { t: "Evolution", q: "Which mechanism introduces entirely new alleles into a population?", o: ["Selection", "Mutation", "Drift", "Gene Flow"], a: 1, e: "Mutation is the ultimate source of variation." },
+            { t: "Evolution", q: "Movement of alleles into or out of a population due to migration is:", o: ["Drift", "Gene Flow", "Selection", "Speciation"], a: 1, e: "Mixing genes between populations." },
+            { t: "Evolution", q: "Selection that favors the average (intermediate) phenotype is:", o: ["Directional", "Disruptive", "Stabilizing", "Sexual"], a: 2, e: "Stabilizing selection narrows the range." },
+            { t: "Evolution", q: "Selection that favors one extreme of the trait distribution is:", o: ["Stabilizing", "Directional", "Disruptive", "Artificial"], a: 1, e: "Shifts the average in one direction (e.g., longer necks)." },
+            { t: "Evolution", q: "Selection that favors both extremes but not the average is:", o: ["Directional", "Stabilizing", "Disruptive", "Kin"], a: 2, e: "Can lead to two distinct groups/species." },
+            { t: "Evolution", q: "What is 'Adaptive Radiation'?", o: ["Death by radiation", "Rapid evolution of many species from one ancestor", "Slow movement of continents", "Natural selection"], a: 1, e: "Common on island chains (e.g., Galapagos Finches)." },
+            { t: "Evolution", q: "The 'Founder Effect' is a type of:", o: ["Natural Selection", "Genetic Drift", "Gene Flow", "Mutation"], a: 1, e: "Occurs when a small group starts a new population." },
+            { t: "Evolution", q: "A 'Bottleneck Effect' occurs after:", o: ["A population boom", "A drastic reduction in population size", "Migration", "Mating"], a: 1, e: "A disaster leaves only a few survivors with limited genetic diversity." },
+            { t: "Evolution", q: "Hardy-Weinberg equilibrium describes a population that:", o: ["Is evolving rapidly", "Is not evolving", "Is going extinct", "Is mutating"], a: 1, e: "A theoretical non-evolving state." },
+            { t: "Evolution", q: "Which is NOT a condition for Hardy-Weinberg equilibrium?", o: ["Random mating", "No mutation", "Small population size", "No selection"], a: 2, e: "It requires a VERY LARGE population." },
+            { t: "Evolution", q: "Artificial Selection is driven by:", o: ["The environment", "Nature", "Humans", "Luck"], a: 2, e: "Selective breeding of dogs, crops, etc." },
+            { t: "Evolution", q: "Sexual selection can lead to:", o: ["Better camouflage", "Sexual dimorphism (differences between males/females)", "Smaller size", "Extinction"], a: 1, e: "Peacock feathers are a classic example." },
+            { t: "Evolution", q: "What is 'Fitness' in evolutionary terms?", o: ["Strength", "Speed", "Reproductive success", "Lifespan"], a: 2, e: "Ability to pass genes to the next generation." },
+            { t: "Evolution", q: "Vestigial structures are:", o: ["Essential for survival", "Remnants of structures that served a purpose in ancestors", "New mutations", "Found only in plants"], a: 1, e: "Example: Human tailbone or whale pelvic bones." },
+            { t: "Evolution", q: "Which type of evolution produces analogous structures?", o: ["Divergent", "Convergent", "Coevolution", "Parallel"], a: 1, e: "Unrelated species evolving similar solutions." },
+            { t: "Evolution", q: "Coevolution occurs when:", o: ["Two species evolve in response to each other", "A species splits into two", "A species dies out", "Humans breed plants"], a: 0, e: "Common in predator-prey or flower-pollinator pairs." },
+            { t: "Evolution", q: "What is 'Speciation'?", o: ["Individual growth", "The formation of new and distinct species", "An animal's death", "A genetic mutation"], a: 1, e: "The bridge between microevolution and macroevolution." },
+            { t: "Evolution", q: "Macroevolution refers to changes:", o: ["Within a species", "Above the species level (over long time periods)", "In a single DNA base", "In an individual's lifetime"], a: 1, e: "Broad patterns of evolutionary change." }
+        ];
 
         function shuffle(array) {
             const newArr = [...array];
@@ -102,9 +175,8 @@
             return newArr;
         }
 
-        // --- APP COMPONENT ---
         function App() {
-            const [view, setView] = useState('start'); // start, quiz, result
+            const [view, setView] = useState('start'); 
             const [quizData, setQuizData] = useState([]);
             const [currentIndex, setCurrentIndex] = useState(0);
             const [score, setScore] = useState(0);
@@ -113,152 +185,93 @@
 
             const startQuiz = () => {
                 setQuizData(shuffle(QUESTIONS));
-                setCurrentIndex(0);
-                setScore(0);
-                setSelected(null);
-                setIsAnswered(false);
+                setCurrentIndex(0); setScore(0); setSelected(null); setIsAnswered(false);
                 setView('quiz');
             };
 
             const handleAnswer = () => {
                 if (selected === null) return;
-                if (selected === quizData[currentIndex].correct) {
-                    setScore(s => s + 1);
-                }
+                if (selected === quizData[currentIndex].a) setScore(s => s + 1);
                 setIsAnswered(true);
             };
 
             const handleNext = () => {
                 if (currentIndex < quizData.length - 1) {
-                    setCurrentIndex(c => c + 1);
-                    setSelected(null);
-                    setIsAnswered(false);
-                } else {
-                    setView('result');
-                }
+                    setCurrentIndex(c => c + 1); setSelected(null); setIsAnswered(false);
+                } else { setView('result'); }
             };
 
-            if (view === 'start') {
-                return html`
-                    <div class="flex flex-col items-center justify-center min-h-screen p-6 animate-slide-up">
-                        <div class="glass p-10 md:p-16 rounded-[3rem] text-center max-w-2xl shadow-2xl border-blue-500/30">
-                            <div class="inline-block p-4 bg-blue-600/20 rounded-2xl mb-8">
-                                <svg class="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86 .517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                                </svg>
-                            </div>
-                            <h1 class="text-5xl font-heading font-bold text-white mb-4">GenBio 2 Reviewer</h1>
-                            <p class="text-slate-400 text-lg mb-12 max-w-md mx-auto leading-relaxed">
-                                Complete mastery assessment covering Evolution, Systematics, and Geologic Time.
-                            </p>
-                            <button 
-                                onClick=${startQuiz}
-                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 rounded-[2rem] text-xl shadow-[0_0_40px_rgba(37,99,235,0.3)] transition-all active:scale-95"
-                            >
-                                START 150-QUESTION EXAM
-                            </button>
-                            <p class="mt-8 text-[10px] uppercase tracking-widest text-slate-500 font-bold">HTML-Focused • No Build • 100% Compat</p>
-                        </div>
+            if (view === 'start') return html`
+                <div class="flex flex-col items-center justify-center min-h-screen p-6 animate-slide-up">
+                    <div class="glass p-10 md:p-16 rounded-[3rem] text-center max-w-2xl shadow-2xl border-blue-500/20">
+                        <h1 class="text-5xl font-heading font-bold text-white mb-4">GenBio 2 Master</h1>
+                        <p class="text-slate-400 text-lg mb-12 max-w-md mx-auto">
+                            100 Unique Questions strictly covering Systematics, Cladistics, Time Scale, Fossils, and Evolution.
+                        </p>
+                        <button onClick=${startQuiz} class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 rounded-[2rem] text-xl transition-all active:scale-95 shadow-xl">
+                            START 100-ITEM REVIEWER
+                        </button>
+                        <p class="mt-8 text-[10px] uppercase tracking-[0.3em] text-slate-500 font-bold">Verified Curriculum Knowledge</p>
                     </div>
-                `;
-            }
+                </div>
+            `;
 
-            if (view === 'result') {
-                const pct = Math.round((score / quizData.length) * 100);
-                return html`
-                    <div class="flex flex-col items-center justify-center min-h-screen p-6 animate-slide-up">
-                        <div class="glass p-12 rounded-[3.5rem] text-center max-w-xl w-full shadow-2xl border-blue-500/30">
-                            <h2 class="text-3xl font-heading font-bold text-white mb-8">Performance Summary</h2>
-                            <div class="text-8xl font-black text-blue-500 mb-4">${pct}%</div>
-                            <div class="text-2xl font-bold text-slate-300 mb-12">${score} / ${quizData.length} Correct</div>
-                            <button 
-                                onClick=${() => setView('start')}
-                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 rounded-2xl text-xl transition-all"
-                            >
-                                BACK TO HUB
-                            </button>
-                        </div>
+            if (view === 'result') return html`
+                <div class="flex flex-col items-center justify-center min-h-screen p-6 animate-slide-up">
+                    <div class="glass p-12 rounded-[3.5rem] text-center max-w-xl w-full">
+                        <h2 class="text-3xl font-heading font-bold text-white mb-4">Exam Result</h2>
+                        <div class="text-8xl font-black text-blue-500 mb-2">${Math.round((score/quizData.length)*100)}%</div>
+                        <div class="text-2xl font-bold text-slate-300 mb-12">${score} / ${quizData.length} Correct</div>
+                        <button onClick=${() => setView('start')} class="w-full bg-blue-600 py-5 rounded-2xl text-xl font-bold">RESTART</button>
                     </div>
-                `;
-            }
+                </div>
+            `;
 
             const current = quizData[currentIndex];
-            const progress = ((currentIndex + 1) / quizData.length) * 100;
-
             return html`
-                <div class="max-w-3xl mx-auto min-h-screen py-12 px-4 flex flex-col">
-                    <div class="flex justify-between items-end mb-6">
+                <div class="max-w-3xl mx-auto min-h-screen py-10 px-4 flex flex-col">
+                    <div class="flex justify-between items-end mb-6 px-2">
                         <div class="space-y-1">
-                            <span class="text-[10px] font-black uppercase tracking-widest text-blue-400">Unit: ${current.topic}</span>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-blue-400">${current.t}</span>
                             <div class="text-2xl font-heading font-bold">Item ${currentIndex + 1} of ${quizData.length}</div>
                         </div>
-                        <div class="glass px-5 py-2 rounded-2xl text-sm font-bold border-blue-500/30">
-                            Score: <span class="text-blue-400">${score}</span>
-                        </div>
+                        <div class="glass px-5 py-2 rounded-2xl text-sm font-bold">Score: ${score}</div>
                     </div>
 
-                    <div class="w-full h-2.5 bg-slate-800 rounded-full mb-12 overflow-hidden border border-slate-700">
-                        <div 
-                            class="h-full bg-blue-500 transition-all duration-700 ease-out"
-                            style="width: ${progress}%"
-                        ></div>
+                    <div class="w-full h-1.5 bg-slate-800 rounded-full mb-10 overflow-hidden">
+                        <div class="h-full bg-blue-500 transition-all duration-500" style="width: ${((currentIndex+1)/quizData.length)*100}%"></div>
                     </div>
 
-                    <div class="glass p-8 md:p-14 rounded-[3.5rem] shadow-2xl animate-slide-up">
-                        <h2 class="text-2xl md:text-3xl font-bold text-white mb-12 leading-[1.3]">
-                            ${current.question}
-                        </h2>
-
-                        <div class="grid gap-4 mb-12">
-                            ${current.options.map((opt, i) => {
-                                let style = "option-btn w-full p-6 text-left rounded-[2rem] border-2 font-bold text-lg flex items-center gap-5 ";
+                    <div class="glass p-8 md:p-12 rounded-[3rem] animate-slide-up">
+                        <h2 class="text-2xl font-bold text-white mb-10">${current.q}</h2>
+                        <div class="grid gap-3 mb-10">
+                            ${current.o.map((opt, i) => {
+                                let style = "option-btn w-full p-5 text-left rounded-2xl border-2 font-bold flex items-center gap-4 ";
                                 if (isAnswered) {
-                                    if (i === current.correct) style += "bg-emerald-500/20 border-emerald-500 text-emerald-400 ";
-                                    else if (i === selected) style += "bg-red-500/20 border-red-500 text-red-400 ";
-                                    else style += "bg-slate-800/40 border-slate-700 text-slate-500 opacity-50 ";
+                                    if (i === current.a) style += "bg-emerald-500/20 border-emerald-500 text-emerald-400";
+                                    else if (i === selected) style += "bg-red-500/20 border-red-500 text-red-400";
+                                    else style += "bg-slate-800/40 border-slate-700 text-slate-500";
                                 } else {
-                                    if (i === selected) style += "bg-blue-600/20 border-blue-500 text-white shadow-xl ";
-                                    else style += "bg-slate-800/40 border-slate-800 hover:border-slate-500 text-slate-300 ";
+                                    style += (i === selected) ? "bg-blue-600/20 border-blue-500 text-white" : "bg-slate-800/40 border-slate-800 text-slate-300";
                                 }
-
-                                return html`
-                                    <button 
-                                        key=${i}
-                                        onClick=${() => !isAnswered && setSelected(i)}
-                                        class=${style}
-                                    >
-                                        <span class="w-10 h-10 flex items-center justify-center rounded-2xl border-2 border-current text-sm opacity-60">
-                                            ${String.fromCharCode(65 + i)}
-                                        </span>
-                                        <span class="flex-1">${opt}</span>
-                                    </button>
-                                `;
+                                return html`<button onClick=${() => !isAnswered && setSelected(i)} class=${style}>
+                                    <span class="w-8 h-8 flex items-center justify-center rounded-xl border-2 border-current text-xs">${String.fromCharCode(65+i)}</span>
+                                    ${opt}
+                                </button>`;
                             })}
                         </div>
-
                         ${isAnswered && html`
-                            <div class="mb-12 p-8 bg-blue-900/30 border border-blue-500/20 rounded-[2.5rem] animate-slide-up">
-                                <div class="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-2">Explanatory Note</div>
-                                <p class="text-blue-100 italic leading-relaxed text-lg">${current.explanation}</p>
+                            <div class="mb-10 p-6 bg-blue-900/20 border border-blue-500/10 rounded-2xl animate-slide-up">
+                                <p class="text-blue-100 italic font-medium">${current.e}</p>
                             </div>
                         `}
-
-                        <button
-                            onClick=${isAnswered ? handleNext : handleAnswer}
-                            disabled=${selected === null}
-                            class="w-full py-6 rounded-[2rem] font-black text-xl tracking-[0.1em] uppercase transition-all ${
-                                selected === null 
-                                ? "bg-slate-800 text-slate-600" 
-                                : "bg-blue-600 hover:bg-blue-700 text-white shadow-2xl active:scale-95"
-                            }"
-                        >
-                            ${isAnswered ? (currentIndex === quizData.length - 1 ? "FINISH" : "NEXT") : "CONFIRM"}
+                        <button onClick=${isAnswered ? handleNext : handleAnswer} disabled=${selected === null} class="w-full py-5 rounded-2xl font-black text-lg bg-blue-600 text-white shadow-xl">
+                            ${isAnswered ? "CONTINUE" : "SUBMIT"}
                         </button>
                     </div>
                 </div>
             `;
         }
-
         render(html`<${App} />`, document.getElementById('root'));
     </script>
 </body>
